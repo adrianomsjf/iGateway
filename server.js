@@ -1,5 +1,8 @@
 const dotenv = require('dotenv')
 dotenv.config()
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
 const ipt = require('./ipt')
 const db = require('./db')
 const processes =  require('./processes')
@@ -80,11 +83,69 @@ async function init() {
    }
 
    // Inicializa tarefas
-   processes.init()
-   console.log('Tarefas: Inicializadas')
+   //processes.init()
+   //console.log('Tarefas: Inicializadas')
    console.log('===========================================================================')
-}
+   console.log('Inicilizando Servidor iGateway')
+   
+   // Configurations
+   const options = {
+      inflate: true,
+      limit: '2mb',
+      type: 'application/octet-stream'
+   };   
+   app.use(bodyParser.raw(options));
+   app.use(bodyParser.json({ limit: '5mb' }));
+   app.use(bodyParser.urlencoded({ extended: false }));
+   app.use(bodyParser.text());
 
+   const server = app.listen(8080,global.LOCAL_ADDRESS || null, function () {
+      const host = server.address().address
+      const port = server.address().port
+      console.log("Servidor iGateway on-line em http://%s:%s", host, port);
+      console.log('===========================================================================')
+   });
+
+   terminal.enableOnline()
+
+   // Endpoint new user
+// Answer for remote user authorization
+var access_answer = {
+   result: {
+       event: 7, 
+       user_name: 'John Doe',
+       user_id: 1000,
+       user_image: true, 
+       portal_id: 1,
+       actions: [
+           {
+               action: 'sec_box', 
+               parameters: 'id=65793=1, reason=1' 
+           }
+       ],
+       message:"Online access"
+   }
+};
+
+
+app.post('/new_user_identified.fcgi', function (req, res) {
+   console.log("endpoint: NEW USER IDENTIFIED");
+   console.log("Data: ");
+   console.log("Length: " + req.body.length);
+   console.log(req.body);
+   res.json(access_answer);
+ })
+
+/*
+   app.all('/**', (request, response) => {
+      //console.log('\n--- NEW REQUEST @ ' + moment().format('DD/MM/YYYY kk:mm:ss') + ' ---');
+      console.log('Path -> ' + request.path);
+      console.log('Query params -> ' + JSON.stringify(request.query));
+      console.log('Content type -> ' + request.get('content-type'));
+      console.log('Body length -> ' + request.get('content-length'));
+      response.sendStatus(200)
+    });
+*/
+}
 init()
 //=============================================================================================
-

@@ -11,6 +11,7 @@ async function login() {
       },{
          timeout: 5000
       })
+      global.LOCAL_ADDRESS = ret.request.socket.localAddress
       if (ret.status==200) {
          global.TERMINAL_SESSION = ret.data.session
          return ret.data.session
@@ -183,6 +184,38 @@ async function checkTerminal() {
    return global.TERMINAL_ESTADO
 }
 
+async function enableOnline() {
+   try {
+      const ret1 = await axios.post(`http://${TERMINAL_IP}/destroy_objects.fcgi?session=${global.TERMINAL_SESSION}`,{
+         object: "devices",
+         where: {
+             devices: { id: 8080 }
+         }
+      });
+      console.log("destroyOnlineObject success: ", ret1.data);
+      const ret2 = await axios.post(`http://${TERMINAL_IP}/create_objects.fcgi?session=${global.TERMINAL_SESSION}`,{
+         object: "devices",
+         values: [
+            {
+               id : 8080,
+               name: "iGateway",
+               ip: global.LOCAL_ADDRESS+":8080",
+               public_key: ""
+            }
+         ]
+      });
+      console.log("createOnlineObject success: ", ret2.data);
+      const ret3 = await axios.post(`http://${TERMINAL_IP}/set_configuration.fcgi?session=${global.TERMINAL_SESSION}`,{
+         online_client: {
+            server_id: "8080"
+         }
+      });
+      console.log("setOnline success: ", ret3.data);
+      
+   } catch (error) {
+       console.log("Error performing createOnlineObject: ", error.data);
+   }
+}
 
 
-module.exports = { init, login, getInfo, getUsers, syncUsers, checkTerminal }
+module.exports = { init, login, getInfo, getUsers, syncUsers, checkTerminal, enableOnline }
