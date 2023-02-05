@@ -8,3 +8,5 @@ Verificar nescessidade e logica do login
 Baixar e guardar documentação idFace
 Questão do Ipt manda só o que foi atualizado, como fica quando precisa deletar pedestres
 Questão do Ipt quando um pesdeste deve ou não ser enviado ao terminal, cuidado com deleção de template
+Validar/Utilizar Keep Alive
+Verificar pq foto não está aparecendo

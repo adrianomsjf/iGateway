@@ -32,6 +32,12 @@ async function init() {
          FACE2_OUTRO_DISP NUMERIC,
          PRIMARY KEY (CPF)
       )`)
+      //------------ MARCACOES ---------------------------
+      await db.exec(/*sql*/`CREATE TABLE IF NOT EXISTS marcacoes (
+         CPF TEXT,
+         MARCACAO NUMERIC,
+         REGISTRADA NUMERIC
+      )`)
       return `Conectado ## INICIALIZADO ## - Versão: ${config.VALOR}`                                    
    } else {
       return `Conectado - Versão: ${config.VALOR}`                                    
@@ -63,4 +69,12 @@ async function replacePedestrians(pedestrians) {
    }
 }
 
-module.exports = { init, getPedestrians, replacePedestrians }
+async function insertMark(mark) {
+   await db.exec(/*sql*/`INSERT INTO marcacoes VALUES(
+      '${mark.CPF}',
+      '${mark.MARCACAO}',
+      '${mark.REGISTRADA}'
+   )`) 
+}
+
+module.exports = { init, getPedestrians, replacePedestrians, insertMark }

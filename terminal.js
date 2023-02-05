@@ -184,38 +184,42 @@ async function checkTerminal() {
    return global.TERMINAL_ESTADO
 }
 
-async function enableOnline() {
+async function cfgTerminal() {
    try {
-      const ret1 = await axios.post(`http://${TERMINAL_IP}/destroy_objects.fcgi?session=${global.TERMINAL_SESSION}`,{
+      await axios.post(`http://${TERMINAL_IP}/destroy_objects.fcgi?session=${global.TERMINAL_SESSION}`,{
          object: "devices",
          where: {
-             devices: { id: 8080 }
+             devices: { id: 8000 }
          }
       });
-      console.log("destroyOnlineObject success: ", ret1.data);
-      const ret2 = await axios.post(`http://${TERMINAL_IP}/create_objects.fcgi?session=${global.TERMINAL_SESSION}`,{
+      await axios.post(`http://${TERMINAL_IP}/create_objects.fcgi?session=${global.TERMINAL_SESSION}`,{
          object: "devices",
          values: [
             {
-               id : 8080,
+               id : 8000,
                name: "iGateway",
-               ip: global.LOCAL_ADDRESS+":8080",
+               ip: global.LOCAL_ADDRESS+":8000",
                public_key: ""
             }
          ]
       });
-      console.log("createOnlineObject success: ", ret2.data);
-      const ret3 = await axios.post(`http://${TERMINAL_IP}/set_configuration.fcgi?session=${global.TERMINAL_SESSION}`,{
+      console.log("Servidor iGateway Cadastrado");
+      await axios.post(`http://${TERMINAL_IP}/set_configuration.fcgi?session=${global.TERMINAL_SESSION}`,{
+         general: {
+            online: "1",
+            local_identification: "1"
+         },
          online_client: {
-            server_id: "8080"
+            server_id: "8000",
+            contingency_enabled: "0",
          }
       });
-      console.log("setOnline success: ", ret3.data);
+      console.log("Modo On-line Ativado");
       
    } catch (error) {
-       console.log("Error performing createOnlineObject: ", error.data);
+       console.log("Erro ao configurar terminal", error);
    }
 }
 
 
-module.exports = { init, login, getInfo, getUsers, syncUsers, checkTerminal, enableOnline }
+module.exports = { init, login, getInfo, getUsers, syncUsers, checkTerminal, cfgTerminal }
