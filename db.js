@@ -35,7 +35,10 @@ async function init() {
       //------------ MARCACOES ---------------------------
       await db.exec(/*sql*/`CREATE TABLE IF NOT EXISTS marcacoes (
          CPF TEXT,
+         ID_APONTAMENTO TEXT,
          MARCACAO NUMERIC,
+         COD_HASH TEXT,
+         IMEI TEXT,
          REGISTRADA NUMERIC
       )`)
       return `Conectado ## INICIALIZADO ## - Versão: ${config.VALOR}`                                    
@@ -46,6 +49,10 @@ async function init() {
 
 async function getPedestrians() {
    return await db.all(/*sql*/`SELECT * FROM pedestres`)
+}
+
+async function findPedestrian(cpf) {
+   return await db.get(/*sql*/`SELECT * FROM pedestres where CPF='${cpf}'`)
 }
 
 async function replacePedestrians(pedestrians) {
@@ -72,9 +79,12 @@ async function replacePedestrians(pedestrians) {
 async function insertMark(mark) {
    await db.exec(/*sql*/`INSERT INTO marcacoes VALUES(
       '${mark.CPF}',
+      '${mark.ID_APONTAMENTO}',
       '${mark.MARCACAO}',
+      '${mark.COD_HASH}',
+      '${mark.IMEI}',
       '${mark.REGISTRADA}'
    )`) 
 }
 
-module.exports = { init, getPedestrians, replacePedestrians, insertMark }
+module.exports = { init, getPedestrians, replacePedestrians, insertMark, findPedestrian }

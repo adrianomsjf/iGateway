@@ -1,3 +1,5 @@
+PROCESSO DE LOGIN, feito pelo painel iGateway como ativar terminal
+
 Fazer parametro serem configurados pelo Front
 Verificar parametros das rotas relacionado a versões
    # mp_config
@@ -5,8 +7,15 @@ Verificar parametros das rotas relacionado a versões
    # mp_pedestres
    VERSAO_APP=8
 Verificar nescessidade e logica do login
+Criar relogio independete ou diferença do relogio, consultar Hora Legal
 Baixar e guardar documentação idFace
 Questão do Ipt manda só o que foi atualizado, como fica quando precisa deletar pedestres
 Questão do Ipt quando um pesdeste deve ou não ser enviado ao terminal, cuidado com deleção de template
 Validar/Utilizar Keep Alive
+Verificar gerador UUID marcação
+Verificar versão APP
+Verificar HORA_SERV no registro de apontamento
 Verificar pq foto não está aparecendo
+Entender e documentas as diveras rotas existentes, separação server
+Conferir rotas utilizadas pelo mp_config
+Entende rota de login

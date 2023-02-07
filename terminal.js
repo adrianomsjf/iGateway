@@ -47,6 +47,7 @@ async function init() {
    if (await login()) {
       const cfg = await getInfo()
       if (cfg) {
+         global.TERMINAL_NS = cfg.serial
          return cfg.serial
       } else {
          return null

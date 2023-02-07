@@ -1,13 +1,28 @@
 const db = require('./db')
 const { format } = require('date-fns')
-const { scpf } = require('./lib')
+const { v4: uuidv4 } = require('uuid')
+const { scpf, calcHash } = require('./lib')
+const ipt = require('./ipt')
 
 async function recMarks(req,res) {
-   await db.insertMark({
-      CPF : scpf(req.body.user_id),
-      MARCACAO : format(Date.now(), 'yyyy-MM-dd HH:mm:ss'),//Date.now(),
+   const cpf = req.body.user_id
+   const cpfStr = scpf(cpf)
+   const pedestrian = await db.findPedestrian(cpfStr)
+   console.log(pedestrian)
+   const marcacao = Date.now()
+   const codHash = calcHash(cpf,marcacao)
+   const regMark = {
+      CPF : cpfStr,
+      ID_APONTAMENTO: uuidv4(),
+      COD_PEDESTRE: pedestrian.CODIGO,
+      MARCACAO : format(marcacao, 'yyyy-MM-dd HH:mm:ss OOOO'),
+      COD_HASH : codHash,
+      IMEI : global.TERMINAL_NS,
       REGISTRADA : false
-   })
+   }
+   regMark.REGISTRADA = await ipt.postMark(regMark)
+   console.log('Apontamento:',regMark.CPF,regMark.MARCACAO,regMark.REGISTRADA)
+   await db.insertMark(regMark)
    res.json({
       result: {
          event: 7, 
