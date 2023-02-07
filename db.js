@@ -3,7 +3,7 @@ const { open } = require('sqlite')
 
 async function init() {
    const db = await open({
-      filename: 'database.db',
+      filename: 'iGateway.db',
       driver: sqlite3.Database
    })
    global.db = db
@@ -36,11 +36,13 @@ async function init() {
       await db.exec(/*sql*/`CREATE TABLE IF NOT EXISTS marcacoes (
          CPF TEXT,
          ID_APONTAMENTO TEXT,
+         COD_PEDESTRE NUMERIC,
          MARCACAO NUMERIC,
          COD_HASH TEXT,
          IMEI TEXT,
          REGISTRADA NUMERIC
       )`)
+      await db.exec(/*sql*/`CREATE UNIQUE INDEX IDX_ID_APONTAMENTO ON marcacoes (ID_APONTAMENTO);`)
       return `Conectado ## INICIALIZADO ## - Versão: ${config.VALOR}`                                    
    } else {
       return `Conectado - Versão: ${config.VALOR}`                                    
@@ -80,6 +82,7 @@ async function insertMark(mark) {
    await db.exec(/*sql*/`INSERT INTO marcacoes VALUES(
       '${mark.CPF}',
       '${mark.ID_APONTAMENTO}',
+      '${mark.COD_PEDESTRE}',
       '${mark.MARCACAO}',
       '${mark.COD_HASH}',
       '${mark.IMEI}',
@@ -87,4 +90,13 @@ async function insertMark(mark) {
    )`) 
 }
 
-module.exports = { init, getPedestrians, replacePedestrians, insertMark, findPedestrian }
+async function unregisteredMarks() {
+   return await db.all(/*sql*/`SELECT * FROM marcacoes WHERE REGISTRADA='false'`)
+}
+
+async function registerMark(ID_APONTAMENTO) {
+   await db.exec(/*sql*/`UPDATE marcacoes SET REGISTRADA = true WHERE ID_APONTAMENTO='${ID_APONTAMENTO}'`)
+}
+
+
+module.exports = { init, getPedestrians, replacePedestrians, insertMark, findPedestrian, unregisteredMarks, registerMark }

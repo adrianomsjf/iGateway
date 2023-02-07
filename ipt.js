@@ -10,14 +10,14 @@ async function getCfg() {
          `chave_acesso=${CHAVE_ACESSO}&`+
          `codterminal=${CODTERMINAL}&`+
          `versao_and=${VERSAO_AND}`)
-      return true
       if (ret.data.config==0) {
          console.log('Erro ao ler configurações do IPT[',ret.config.url ||'---',']')
          return null
       }
       return ret.data.config[0]
    } catch(err) {
-      console.log('Erro ao acessar servidor IPT [',err.message,'-',err.config.url,']')
+      // Habilitar somente para DEBUG
+      // console.log('Erro ao acessar servidor IPT [',err.message,'-',err.config.url,']')
       return null
    }
 }
@@ -91,7 +91,8 @@ async function postMark(regMark) {
       return true
    } catch(err) {
       const msg = (err.response && err.response.data) ? err.response.data : ""
-      console.log('Erro ao acessar servidor IPT [',err.message,'-',msg,'-',err.config.url,']')
+      // Habilitar somente para DEBUG
+      // console.log('Erro ao acessar servidor IPT [',err.message,'-',msg,'-',err.config.url,']')
       return false
    }
 }

@@ -15,13 +15,13 @@ const {IPT_HOST, IPT_PATH, CHAVE_ACESSO, CODTERMINAL} = process.env
 
 //=============================================================================================
 // Incialização
-console.log('===========================================================================')
+console.log('==================================================================================')
 console.log('iGateway Versão 1.0.00')
 console.log('')
 console.log(`HOST: ${IPT_HOST}/${IPT_PATH}`)
 console.log('Chave Acesso: ',CHAVE_ACESSO)
 console.log('Cod. Terminal: ', CODTERMINAL)
-console.log('===========================================================================')
+console.log('==================================================================================')
 console.log('Inicializando...')
 
 async function init() {
@@ -85,7 +85,7 @@ async function init() {
    
    }
 
-   console.log('===========================================================================')
+   console.log('==================================================================================')
    console.log('Inicilizando Servidor iGateway')
    
    // Configurations
@@ -109,15 +109,15 @@ async function init() {
    console.log("Servidor iGateway on-line em http://%s:%s", host, port);
    
    
-   console.log('===========================================================================')
+   console.log('==================================================================================')
    console.log('Configurando Terminal')
    await terminal.cfgTerminal()
 
 
-   console.log('===========================================================================')
+   console.log('==================================================================================')
    console.log('Iniciando Tarefas...')
-   //processes.init()
-   //console.log('Tarefas: Inicializadas')
+   processes.init()
+   console.log('Tarefas: Inicializadas')
 
 }
 init()

@@ -8,7 +8,6 @@ async function recMarks(req,res) {
    const cpf = req.body.user_id
    const cpfStr = scpf(cpf)
    const pedestrian = await db.findPedestrian(cpfStr)
-   console.log(pedestrian)
    const marcacao = Date.now()
    const codHash = calcHash(cpf,marcacao)
    const regMark = {
@@ -21,7 +20,7 @@ async function recMarks(req,res) {
       REGISTRADA : false
    }
    regMark.REGISTRADA = await ipt.postMark(regMark)
-   console.log('Apontamento:',regMark.CPF,regMark.MARCACAO,regMark.REGISTRADA)
+   console.log('Apontamento:',regMark.CPF,regMark.MARCACAO,regMark.REGISTRADA ? 'REG' : 'NREG')
    await db.insertMark(regMark)
    res.json({
       result: {
@@ -35,4 +34,17 @@ async function recMarks(req,res) {
    })
 }
 
-module.exports = { recMarks }
+async function syncMarks() {
+   const unregisteredMarks = await db.unregisteredMarks()
+   let registered = 0
+   for (const regMark of unregisteredMarks) {
+      const REGISTRADA = await ipt.postMark(regMark)
+      if (REGISTRADA) {
+         await db.registerMark(regMark.ID_APONTAMENTO)
+         registered++
+      }
+   }
+   return 'Registradas: '+registered+' de '+unregisteredMarks.length
+}
+
+module.exports = { recMarks, syncMarks }
