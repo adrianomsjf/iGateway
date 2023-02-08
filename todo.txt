@@ -1,5 +1,18 @@
-PROCESSO DE LOGIN, feito pelo painel iGateway como ativar terminal
+Executável OK 
+Acerto Relógio OK
+Apresentação
+* Checagem para bater ponto
 
+LOGIN
+CAMPO MODELO
+LOG de acerto de relogio
+Proteção de acertio de relogio
+
+Axios, SQLIT PKG NodeModules
+
+PROCESSO DE LOGIN, feito pelo painel iGateway como ativar terminal
+Ajustes processo de retorno automático on-line (Desconecãoe outros)
+Renovar Sessão IDFace
 Fazer parametro serem configurados pelo Front
 Verificar parametros das rotas relacionado a versões
    # mp_config

@@ -34,7 +34,26 @@ async function getInfo() {
       if (ret.status==200) {
          return ret.data
       } else {
-         console.log('Erro ao fazer login no Terminal[',ret.status, ret,statusText,']')
+         console.log('Erro ao pegar informações do Terminal[',ret.status, ret,statusText,']')
+         return null
+      }
+   } catch(err) {
+      console.log('Erro ao acessar Terminal [',err.message,'-',err.config.url,']')
+      return null
+   }
+}
+
+async function getCfg() {
+   try {
+      const ret = await axios.post(`http://${TERMINAL_IP}/get_configuration.fcgi?session=${global.TERMINAL_SESSION}`,{
+         general: ["online"]
+      },{
+         timeout: 5000
+      })
+      if (ret.status==200) {
+         return ret.data
+      } else {
+         console.log('Erro ao pegar configurações do Terminal[',ret.status, ret,statusText,']')
          return null
       }
    } catch(err) {
@@ -52,6 +71,32 @@ async function init() {
       } else {
          return null
       }
+   }
+}
+
+async function setTime() {
+   const now = new Date()
+   try {
+      const ret = await axios.post(`http://${TERMINAL_IP}/set_system_time.fcgi?session=${global.TERMINAL_SESSION}`,{
+         day: now.getDate(),
+         month: now.getMonth()+1,
+         year: now.getFullYear(),
+         hour: now.getHours(),
+         minute: now.getMinutes(),
+         second: now.getSeconds(),
+      },{
+         timeout: 5000
+      })
+      if (ret.status==200) {
+         console.log("Relógio Ajustado");
+         return ret.data
+      } else {
+         console.log('Erro ao acertar o relógio do Terminal[',ret.status, ret,statusText,']')
+         return null
+      }
+   } catch(err) {
+      console.log('Erro ao acessar Terminal [',err.message,'-',err.config.url,']')
+      return null
    }
 }
 
@@ -176,9 +221,20 @@ async function syncUsers(users) {
 }
 
 async function checkTerminal() {
-   const ret = await getInfo()
-      if (ret) {
-      global.TERMINAL_ESTADO = 'ON-LINE'
+   const ret = await getCfg()
+   if (ret) {      
+      if (ret.general && ret.general.online==1) {
+         global.TERMINAL_ESTADO = 'ON-LINE'
+      } else {
+         console.log('Terminal em modo Off-line')      
+         console.log('Configurando Terminal')      
+         if (cfgTerminal()) {
+            setTime()
+            global.TERMINAL_ESTADO = 'ON-LINE'
+         } else {
+            global.TERMINAL_ESTADO = 'OFF-LINE'
+         }
+      }
    } else {
       global.TERMINAL_ESTADO = 'OFF-LINE'
    }
@@ -216,11 +272,12 @@ async function cfgTerminal() {
          }
       });
       console.log("Modo On-line Ativado");
-      
+      return true
    } catch (error) {
        console.log("Erro ao configurar terminal", error);
+      return false
    }
 }
 
 
-module.exports = { init, login, getInfo, getUsers, syncUsers, checkTerminal, cfgTerminal }
+module.exports = { init, login, getInfo, getUsers, syncUsers, checkTerminal, cfgTerminal, setTime }

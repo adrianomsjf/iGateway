@@ -1,10 +1,9 @@
+const fs = require('fs')
 const dotenv = require('dotenv')
 dotenv.config()
-const { promisify } = require('util')
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const appListen = promisify(app.listen)
 const ipt = require('./ipt')
 const db = require('./db')
 const processes =  require('./processes')
@@ -66,7 +65,7 @@ async function init() {
             // Sincroniza Pedestres Terminal
             process.stdout.write('Sincronizando Pedestres no Terminal: ')
             const {updated, added, deleted} = (await terminal.syncUsers(users)) || {}
-            if (updated) {
+            if (updated>=0) {
                console.log(
                   `${updated} Atualizados |`,
                   `${added} Adicionados |`,
@@ -101,6 +100,12 @@ async function init() {
 
    app.post('/new_user_identified.fcgi', marks.recMarks)
 
+   app.get('/', function(req, res, next) {
+      var html = fs.readFileSync('./html/home.html', 'utf8')
+      //res.render('home', { html: html })
+      res.send(html)
+   })
+
    const server = app.listen(8000,global.LOCAL_ADDRESS || null)
    // Aguarda servidor subir
    await { then(r, f) { server.on('listening', r); server.on('error', f); } }
@@ -111,6 +116,7 @@ async function init() {
    
    console.log('==================================================================================')
    console.log('Configurando Terminal')
+   await terminal.setTime()
    await terminal.cfgTerminal()
 
 
